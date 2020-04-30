@@ -1,4 +1,3 @@
-# owfmodules.skeleton
-Module base repository
+# owfmodules.avrisp.flash_dump
 
-Please read [CONTRIBUTING.md](https://bitbucket.org/octowire/octowire-framework/src/master/CONTRIBUTING.md) to follow the contribution process.
+Module to dump the flash memory of an AVR device. Use the SPI interface and a GPIO port as the Reset line.

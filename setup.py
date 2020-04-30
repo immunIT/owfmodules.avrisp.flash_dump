@@ -4,14 +4,14 @@
 
 from setuptools import setup, find_packages
 
-__authors__ = ""
-__copyright__ = ""
+__authors__ = "Jordan Ovrè, Paul Duncan"
+__copyright__ = "Copyright (c) Jordan Ovrè / Paul Duncan"
 __license__ = "GPLv3"
 __version__ = "1.0.0"
-__contact__ = ""
+__contact__ = "Jordan Ovrè / Ghecko <ghecko78@gmail.com>, Paul Duncan / Eresse <eresse@dooba.io>"
 
-description = ''
-name = 'owfmodules.<category>.<module_name>'
+description = 'Dump the AVR flash memory'
+name = 'owfmodules.avrisp.flash_dump'
 
 setup(
     name=name,
@@ -22,10 +22,13 @@ setup(
     author=__authors__,
     zip_safe=True,
     url='https://bitbucket.org/octowire/' + name,
+    install_requires=[
+        'intelhex>=2.2.1',
+    ],
     classifiers=[
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Programming Language :: Python :: 3',
         'Development Status :: 5 - Production/Stable'
     ],
-    keywords=['octowire', 'framework', 'hardware', 'security']
+    keywords=['octowire', 'framework', 'hardware', 'security', 'AVR', 'ISP', 'dump', 'flash']
 )
