@@ -70,12 +70,11 @@ class FlashDump(AModule):
     def dump(self, spi_interface, reset, flash_size):
         low_byte_read = b'\x20'
         high_byte_read = b'\x28'
-        current_addr = 0
         dump = bytearray()
         # Drive reset low
         reset.status = 0
         with ProgressBar(formatters=self.pb_formatters) as pb:
-            for i in pb(range(0, flash_size, 2), label="Read"):
+            for current_addr in pb(range(0, flash_size, 2), label="Read"):
                 # Read high byte
                 spi_interface.transmit(high_byte_read + struct.pack("<H", current_addr))
                 dump.extend(spi_interface.receive(1))
