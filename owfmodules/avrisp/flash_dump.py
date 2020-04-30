@@ -49,7 +49,7 @@ class FlashDump(AModule):
             formatters.Bar(start="[", end="]", sym_a="#", sym_b="#", sym_c="."),
             formatters.Text(" "),
             formatters.Progress(),
-            formatters.Text("Words "),
+            formatters.Text(" Words "),
             formatters.Text(" [elapsed: "),
             formatters.TimeElapsed(),
             formatters.Text(" left: "),
