@@ -39,7 +39,7 @@ class FlashDump(AModule):
         })
         self.advanced_options.update({
             "flash_size": {"Value": "", "Required": False, "Type": "hex",
-                           "Description": "Flash size (Bytes)", "Default": "0x2000"}
+                           "Description": "Flash size (Bytes)", "Default": "0x00"}
         })
         self.dependencies.append("owfmodules.avrisp.device_id>=1.0.0")
         self.pb_formatters = [
@@ -49,7 +49,7 @@ class FlashDump(AModule):
             formatters.Bar(start="[", end="]", sym_a="#", sym_b="#", sym_c="."),
             formatters.Text(" "),
             formatters.Progress(),
-            formatters.Text(" "),
+            formatters.Text("Words "),
             formatters.Text(" [elapsed: "),
             formatters.TimeElapsed(),
             formatters.Text(" left: "),
@@ -120,7 +120,7 @@ class FlashDump(AModule):
         spi_interface.configure(baudrate=spi_baudrate)
 
         # Avoid enabling memory access twice
-        if self.advanced_options["detect_target"]["Value"]:
+        if not self.advanced_options["detect_target"]["Value"]:
             self.logger.handle("Enable Memory Access...", self.logger.INFO)
             # Drive reset low
             reset.status = 0
@@ -129,8 +129,12 @@ class FlashDump(AModule):
             # Drive reset high
             reset.status = 0
 
-        self.logger.handle("Start dumping the flash memory of the device...", self.logger.INFO)
-        self.dump(spi_interface, reset, self.advanced_options["flash_size"]["Value"])
+        if (self.advanced_options["detect_target"]["Value"] and self.advanced_options["flash_size"]["Value"] != 0) or \
+            (not self.advanced_options["detect_target"]["Value"] and self.advanced_options["flash_size"]["Value"] != 0):
+            self.logger.handle("Start dumping the flash memory of the device...", self.logger.INFO)
+            self.dump(spi_interface, reset, self.advanced_options["flash_size"]["Value"])
+        elif not self.advanced_options["detect_target"]["Value"] and self.advanced_options["flash_size"]["Value"] == 0:
+            self.logger.handle("Invalid flash size", self.logger.ERROR)
 
     def run(self):
         """
