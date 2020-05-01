@@ -74,7 +74,7 @@ class FlashDump(AModule):
         # Drive reset low
         reset.status = 0
         with ProgressBar(formatters=self.pb_formatters) as pb:
-            for current_addr in pb(range(0, flash_size, 2), label="Read"):
+            for current_addr in pb(range(0, flash_size // 2), label="Read"):
                 # Read high byte
                 spi_interface.transmit(high_byte_read + struct.pack("<H", current_addr))
                 dump.extend(spi_interface.receive(1))
@@ -107,6 +107,10 @@ class FlashDump(AModule):
             device = self.get_device_id(spi_bus, reset_line, spi_baudrate)
             if device is not None:
                 self.advanced_options["flash_size"]["Value"] = int(device["flash_size"], 16)
+
+        # Check flash size
+        if self.advanced_options["flash_size"]["Value"] > 131072:
+            self.logger.handle("Invalid flash size. Maximum allowed flash size: 131072", self.logger.ERROR)
 
         spi_interface = SPI(serial_instance=self.owf_serial, bus_id=spi_bus)
         reset = GPIO(serial_instance=self.owf_serial, gpio_pin=reset_line)
