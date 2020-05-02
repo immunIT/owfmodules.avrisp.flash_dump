@@ -24,6 +24,7 @@ setup(
     url='https://bitbucket.org/octowire/' + name,
     install_requires=[
         'intelhex>=2.2.1',
+        'tqdm>=4.45.0'
     ],
     classifiers=[
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
