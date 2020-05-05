@@ -136,7 +136,7 @@ class FlashDump(AModule):
         """
         Main function.
         Dump the flash memory of an AVR device.
-        :return: Nothing or bytes, depending of the 'return_value' parameter.
+        :return: Nothing.
         """
         # If detect_octowire is True then Detect and connect to the Octowire hardware. Else, connect to the Octowire
         # using the parameters that were configured. It sets the self.owf_serial variable if the hardware is found.
