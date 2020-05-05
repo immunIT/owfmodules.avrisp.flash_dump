@@ -1,7 +1,7 @@
 import struct
 import time
 
-from intelhex import IntelHex
+from hexformat.intelhex import IntelHex
 from io import BytesIO
 from tqdm import tqdm
 
@@ -73,10 +73,10 @@ class FlashDump(AModule):
                               bar_format="{desc} : {percentage:3.0f}%[{bar}] {n_fmt}/{total_fmt} Words "
                                          "[elapsed: {elapsed} left: {remaining}]"):
             # Read low byte
-            spi_interface.transmit(low_byte_read + struct.pack("<H", read_addr))
+            spi_interface.transmit(low_byte_read + struct.pack(">H", read_addr))
             dump.write(spi_interface.receive(1))
             # Read high byte
-            spi_interface.transmit(high_byte_read + struct.pack("<H", read_addr))
+            spi_interface.transmit(high_byte_read + struct.pack(">H", read_addr))
             dump.write(spi_interface.receive(1))
 
         # Drive reset high
@@ -86,13 +86,16 @@ class FlashDump(AModule):
         # Save the dump locally
         # Intel Hex file format
         if self.options["intelhex"]["Value"]:
-            dump_hex = IntelHex()
-            dump_hex.puts(0x00, dump.getvalue())
-            dump_hex.write_hex_file(self.options["dumpfile"]["Value"])
+            dump_hex = IntelHex(bytesperline=32)
+            # Change the stream position to the address 0 of the BytesIO handler
+            dump.seek(0)
+            dump_hex = dump_hex.loadbinfh(dump)
+            dump_hex.tofile(self.options["dumpfile"]["Value"])
         # Raw binary file format
         else:
             with open(self.options["dumpfile"]["Value"], 'wb') as f:
                 f.write(dump.getvalue())
+        dump.close()
         self.logger.handle("Dump saved into {}".format(self.options["dumpfile"]["Value"]), self.logger.RESULT)
 
     def process(self):

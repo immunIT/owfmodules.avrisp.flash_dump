@@ -23,7 +23,7 @@ setup(
     zip_safe=True,
     url='https://bitbucket.org/octowire/' + name,
     install_requires=[
-        'intelhex>=2.2.1',
+        'hexformat>=0.2',
         'tqdm>=4.45.0'
     ],
     classifiers=[
