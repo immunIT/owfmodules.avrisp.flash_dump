@@ -57,8 +57,10 @@ class FlashDump(AModule):
     def dump(self, spi_interface, reset, flash_size):
         low_byte_read = b'\x20'
         high_byte_read = b'\x28'
+        load_extended_addr = b'\x4d\x00'
         enable_mem_access_cmd = b'\xac\x53\x00\x00'
         dump = BytesIO()
+        extended_addr = None
 
         self.logger.handle("Enable Memory Access...", self.logger.INFO)
         # Drive reset low
@@ -72,16 +74,20 @@ class FlashDump(AModule):
                               unit_divisor=1024, ascii=" #",
                               bar_format="{desc} : {percentage:3.0f}%[{bar}] {n_fmt}/{total_fmt} Words "
                                          "[elapsed: {elapsed} left: {remaining}]"):
+            # Load extended address
+            if read_addr >> 16 != extended_addr:
+                extended_addr = read_addr >> 16
+                spi_interface.transmit(load_extended_addr + bytes([extended_addr]) + b'\x00')
             # Read low byte
-            spi_interface.transmit(low_byte_read + struct.pack(">H", read_addr))
+            spi_interface.transmit(low_byte_read + struct.pack(">H", read_addr & 0xFFFF))
             dump.write(spi_interface.receive(1))
             # Read high byte
-            spi_interface.transmit(high_byte_read + struct.pack(">H", read_addr))
+            spi_interface.transmit(high_byte_read + struct.pack(">H", read_addr & 0xFFFF))
             dump.write(spi_interface.receive(1))
 
         # Drive reset high
         reset.status = 1
-        self.logger.handle("Successfully dump {} byte(s) from flash memory.".format(flash_size), self.logger.SUCCESS)
+        self.logger.handle("Successfully dump {} bytes from flash memory.".format(flash_size), self.logger.SUCCESS)
 
         # Save the dump locally
         # Intel Hex file format
@@ -107,10 +113,8 @@ class FlashDump(AModule):
             device = self.get_device_id(spi_bus, reset_line, spi_baudrate)
             if device is not None:
                 self.advanced_options["flash_size"]["Value"] = int(device["flash_size"], 16)
-
-        # Check flash size
-        if self.advanced_options["flash_size"]["Value"] > 131072:
-            self.logger.handle("Invalid flash size. Maximum allowed flash size: 131072", self.logger.ERROR)
+            else:
+                return
 
         spi_interface = SPI(serial_instance=self.owf_serial, bus_id=spi_bus)
         reset = GPIO(serial_instance=self.owf_serial, gpio_pin=reset_line)
@@ -124,12 +128,10 @@ class FlashDump(AModule):
         spi_interface.configure(baudrate=spi_baudrate)
 
         # Check if detect is true and flash size > 0 or detect is false and flash size > 0
-        if (self.advanced_options["detect_target"]["Value"] and self.advanced_options["flash_size"]["Value"] > 0) or \
-           (not self.advanced_options["detect_target"]["Value"] and self.advanced_options["flash_size"]["Value"] > 0):
+        if self.advanced_options["flash_size"]["Value"] > 0:
             self.logger.handle("Start dumping the flash memory of the device...", self.logger.INFO)
             self.dump(spi_interface, reset, self.advanced_options["flash_size"]["Value"])
-        # Else if detect is false and flash size not set print an error
-        elif not self.advanced_options["detect_target"]["Value"] and self.advanced_options["flash_size"]["Value"] == 0:
+        else:
             self.logger.handle("Invalid flash size", self.logger.ERROR)
 
     def run(self):
