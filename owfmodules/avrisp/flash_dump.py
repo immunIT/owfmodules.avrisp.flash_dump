@@ -25,7 +25,7 @@ class FlashDump(AModule):
         self.meta.update({
             'name': 'AVR dump flash memory',
             'version': '1.0.0',
-            'description': 'Read the flash memory of AVR microcontrollers.',
+            'description': 'Read the flash memory of AVR microcontrollers',
             'author': 'Jordan Ovrè / Ghecko <jovre@immunit.ch>, Paul Duncan / Eresse <pduncan@immunit.ch>'
         })
         self.options = {
