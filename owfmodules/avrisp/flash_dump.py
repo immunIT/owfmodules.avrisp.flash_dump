@@ -23,7 +23,7 @@ class FlashDump(AModule):
     def __init__(self, owf_config):
         super(FlashDump, self).__init__(owf_config)
         self.meta.update({
-            'name': 'AVR dump flash memory',
+            'name': 'AVR flash memory dump',
             'version': '1.0.0',
             'description': 'Read the flash memory of AVR microcontrollers',
             'author': 'Jordan Ovrè / Ghecko <jovre@immunit.ch>, Paul Duncan / Eresse <pduncan@immunit.ch>'
